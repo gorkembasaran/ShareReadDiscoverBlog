@@ -1,4 +1,10 @@
+{% extends 'bootstrap/base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
 {% include "header.html" %}
+
+<!-- YAKIN ZAMANDA DÜZELTİLECEK, DEĞİŞTİRME BENİM KISMI(test için kullanıyorum) -->
 
   <!-- Page Header -->
   <header class="masthead" style="background-image: url('{{ url_for('static', filename='img/register.webp')}}')">
@@ -8,7 +14,7 @@
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="page-heading">
             <h1>Register</h1>
-            <span class="subheading registerPageOn">Already have an account? <a style="color: white;" href="/login">Login!</a></span>
+            <span class="subheading registerPageOn">Already have an account? <a style="color: white;" href="{{url_for('login')}}">Login!</a></span>
           </div>
         </div>
       </div>
@@ -66,7 +72,20 @@
       </div>
     </div>
   </div>
-  
+
   <hr>
 
-  {% include "footer.html" %}
+
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+
+       {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+
+      </div>
+    </div>
+  </div>
+
+{% include "footer.html" %}
+{% endblock %}
