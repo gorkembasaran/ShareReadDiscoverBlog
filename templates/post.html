@@ -8,7 +8,9 @@
 			<div class="col-lg-8 col-md-10 mx-auto">
 				<div class="post-heading">
 					<h1>{{post.title}}</h1>
-					<h2 class="subheading">{{post.subtitle}}</h2>
+<!--                    KATEGORİ DİZE GETİRİLECEK , {{post.like_num}} EKLENECEK -->
+                    <h3>{{post.category}} </h3>
+                    <h3>{{post.like_num}} </h3>
 					<span class="meta">Posted by
               <a href="#">{{post.author}}</a>
               on {{post.date}}</span>
@@ -23,17 +25,13 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
+					<h2 class="subheading">{{post.subtitle}}</h2>
+
           <p>
-            {{post.body}}
+            {{post.body|safe}}
           </p>
            <hr>
            <div class="clearfix">
-            
-              <button type="button" class="btn btn-outline-primary" id="likeButton">
-                <i class="fas fa-thumbs-up"></i>
-              </button>
-              <div class="likeNumber btn btn-primary float-left"> 0 </div>
-              <!-- yukarıya beğeni sayısı eklenecek -->
           <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
         </div>
           </div>
