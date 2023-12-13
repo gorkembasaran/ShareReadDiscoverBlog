@@ -118,10 +118,12 @@ def owner_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         post = db.session.query(BlogPost).get(int(kwargs['post_id']))
-        if db.session.query(Comment).get(int(kwargs['comment_id'])):
-            comment = db.session.query(Comment).get(int(kwargs['comment_id']))
-            if current_user.id != 1 and current_user.id != comment.comment_author.id:
-                return abort(403)
+        try:
+            if db.session.query(Comment).get(int(kwargs['comment_id'])):
+                comment = db.session.query(Comment).get(int(kwargs['comment_id']))
+                if current_user.id != 1 and current_user.id != comment.comment_author.id:
+                    return abort(403)
+        except:
             return f(*args, **kwargs)
 
         #If id is not 1 then return abort with 403 error
@@ -133,6 +135,7 @@ def owner_only(f):
         #Otherwise continue with the route function
         return f(*args, **kwargs)
     return decorated_function
+
 
 @app.route("/post/<int:post_id>/delete-comment/<int:comment_id>")
 @owner_only
