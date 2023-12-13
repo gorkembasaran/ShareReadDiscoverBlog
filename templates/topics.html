@@ -30,9 +30,17 @@
               {{post.subtitle}}
             </h3>
           </a>
+          <button type="button" class="btn btn-outline-primary" id="likeButton">
+                <i class="fas fa-thumbs-up"></i>
+              </button>
+              <div class="likeNumber btn btn-primary float-left"> {{post.like_num}} </div>
           <p class="post-meta">Posted by
-            <a href="#">{{post.author}}</a>
-            on {{post.date}} <a href="{{url_for('delete_post', post_id=post.id)}}">DELETE POST</a></p>
+            <a href="#">{{post.author.name}} {{post.author.surname}}</a>
+            on {{post.date}}
+            {% if current_user.id == post.author.id or current_user.id == 1 %}
+            <a href="{{url_for('delete_post', post_id=post.id)}}">DELETE POST</a>
+            {% endif %}
+          </p>
 
         </div>
         <hr>

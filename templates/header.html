@@ -7,8 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
-
-  <title>Blog {{ request.path }}</title>
+  {% if request.path.split('/')[2] %}
+  <title>Blog {{ request.path.split('/')[2].capitalize() }}</title>
+  {% elif request.path.split('/')[1] %}
+  <title>{{ request.path.split('/')[1].capitalize() }}</title>
+  {% else %}
+  <title>Blog</title>
+  {% endif %}
 
   <!-- Bootstrap core CSS -->
   <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -95,9 +100,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link showCategories linkCursor">Categories</a>
-            <a class="nav-link hoverShow backgroundHover" href="/movies">Movies</a>
-            <a class="nav-link hoverShow backgroundHover" href="/musics">Musics</a>
-            <a class="nav-link hoverShow backgroundHover bottomRadius" href="/topics">Topics</a>
+            <a class="nav-link hoverShow backgroundHover" href="{{url_for('get_category', name='movies')}}">Movies</a>
+            <a class="nav-link hoverShow backgroundHover" href="{{url_for('get_category', name='musics')}}">Musics</a>
+            <a class="nav-link hoverShow backgroundHover bottomRadius" href="{{url_for('get_category', name='topics')}}">Topics</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/contact">Contact</a>
@@ -113,6 +118,9 @@
             <a class="nav-link" href="/register">Register</a>
           </li>
           {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href=#>{{current_user.name}} {{current_user.surname}}</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
           </li>

@@ -1,3 +1,5 @@
+{% import "bootstrap/wtf.html" as wtf %}
+
 {% include "header.html" %}
 
 <!-- Page Header -->
@@ -12,7 +14,7 @@
 <!--                    KATEGORİ DİZE GETİRİLECEK , {{post.like_num}} EKLENECEK -->
                     <h3>{{post.category}} </h3>
 					<span class="meta">Posted by
-              <a href="#">{{post.author}}</a>
+              <a href="#">{{post.author.name}} {{post.author.surname}}</a>
               on {{post.date}}</span>
           </div>
         </div>
@@ -36,8 +38,39 @@
                 <i class="fas fa-thumbs-up"></i>
               </button>
               <div class="likeNumber btn btn-primary float-left"> {{post.like_num}} </div>
-              <!-- yukarıya beğeni sayısı eklenecek -->
-          <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
+               {% if current_user.id == post.author.id or current_user.id == 1 %}
+               <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
+                {% endif %}
+               <!--           Comments Area -->
+<!--               BURADA DA BASTAN BAKILIP DUZELTILECEK VE TEKRAR DIZAYN EDILECEK YERLERE BAKILSIN-->
+                {{ ckeditor.load() }}
+                {{ ckeditor.config(name='comment_text') }}
+                {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+
+                <div class="col-lg-8 col-md-10 mx-auto comment">
+                    {% for comment in post.comments: %}
+                    <ul class="commentList">
+                        <li>
+                            <div class="commenterImage">
+                                 <img src="{{ comment.comment_author.email | gravatar }}"/>
+                            </div>
+                            <div class="commentText">
+                                {{comment.text|safe}}
+                                <a href="#" class="date sub-text">{{comment.comment_author.name}} {{comment.comment_author.surname}}</a>
+                                <button type="button" class="btn btn-outline-primary" id="likeButton">
+                                <i class="fas fa-thumbs-up"></i>
+                                </button>
+                                <div class="likeNumber btn btn-primary float-left"> {{comment.like_num}} </div>
+                                {% if current_user.id == comment.comment_author.id or current_user.id == 1 %}
+                                <a href="{{url_for('delete_comment', post_id=post.id, comment_id=comment.id)}}">DELETE COMMENT</a>
+                                {% endif %}
+
+                            </div>
+                        </li>
+                    </ul>
+                    {% endfor %}
+                </div>
+
         </div>
           </div>
       </div>

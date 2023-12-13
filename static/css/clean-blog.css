@@ -77,6 +77,10 @@ img::-moz-selection {
   background: transparent;
 }
 
+.comment {
+    padding-top: 20px;
+}
+
 img::selection {
   color: #fff;
   background: transparent;

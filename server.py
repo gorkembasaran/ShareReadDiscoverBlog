@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, abort
+from flask import Flask, render_template, redirect, url_for, request, abort, flash
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
@@ -8,22 +8,23 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from functools import wraps
 from forms import CreatePostForm, LoginForm, RegisterForm, CommentForm
 from sqlalchemy.orm import relationship
+from flask_gravatar import Gravatar
 
-
-# # Delete this code:
-# import requests
-# posts = requests.get("https://api.npoint.io/43644ec4f0013682fc0d").json()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 ckeditor = CKEditor(app)
 Bootstrap(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///default.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/default.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+gravatar = Gravatar(app, size=100, rating='g', default='retro', force_default=False, force_lower=False, use_ssl=False, base_url=None)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+CATEGORIES = ['movies', 'topics', 'musics']
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -49,7 +50,7 @@ class BlogPost(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     author = relationship("User", back_populates="posts")
 
-    title = db.Column(db.String(250), unique=True, nullable=False)
+    title = db.Column(db.String(250), nullable=False)
     subtitle = db.Column(db.String(250), nullable=False)
     date = db.Column(db.String(250), nullable=False)
     body = db.Column(db.Text, nullable=False)
@@ -66,6 +67,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     comment_author = relationship("User", back_populates="comments")
+    like_num = db.Column(db.Integer)
 
     # ***************Child Relationship*************#
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
@@ -76,36 +78,55 @@ with app.app_context():
     db.create_all()
 
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def get_all_posts():
-    posts = BlogPost.query.all()
+    posts = BlogPost.query.order_by(BlogPost.like_num.desc()).all()
     return render_template("index.html", all_posts=posts)
 
 
-@app.route("/<name>")
+@app.route("/category/<name>", methods=["GET", "POST"])
 def get_category(name):
-    posts = BlogPost.query.where(BlogPost.category==name.capitalize())
-    return render_template("index.html", all_posts=posts)
+    if name in CATEGORIES:
+        posts = BlogPost.query.filter_by(category=name.capitalize()).order_by(BlogPost.like_num.desc()).all()
+        return render_template(f"{name.lower()}.html", all_posts=posts)
+    else:
+        return redirect(url_for('get_all_posts'))
 
 
-@app.route("/post/<int:index>")
+@app.route("/post/<int:index>", methods=['GET', 'POST'])
 def show_post(index):
-    posts = BlogPost.query.all()
+    form = CommentForm()
     requested_post = BlogPost.query.get(index)
-    for blog_post in posts:
-        if int(blog_post.id) == index:
-            requested_post = blog_post
-    return render_template("post.html", post=requested_post)
+    if form.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash("You need to login or register to comment.")
+            return redirect(url_for("login"))
+
+        new_comment = Comment(
+            text=form.comment_text.data,
+            comment_author=current_user,
+            parent_post=requested_post,
+            like_num=0
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+    return render_template("post.html", post=requested_post, form=form, current_user=current_user)
 
 
 #Create owner/owner/admin-only decorator
 def owner_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        print(args)
+        post = db.session.query(BlogPost).get(int(kwargs['post_id']))
+        if db.session.query(Comment).get(int(kwargs['comment_id'])):
+            comment = db.session.query(Comment).get(int(kwargs['comment_id']))
+            if current_user.id != 1 and current_user.id != comment.comment_author.id:
+                return abort(403)
+            return f(*args, **kwargs)
+
         #If id is not 1 then return abort with 403 error
         if current_user.is_authenticated:
-            if current_user.id != 1:
+            if current_user.id != 1 and current_user.id != post.author.id:
                 return abort(403)
         else:
             return abort(403)
@@ -113,8 +134,18 @@ def owner_only(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.route("/post/<int:post_id>/delete-comment/<int:comment_id>")
+@owner_only
+def delete_comment(post_id, comment_id):
+    print(comment_id)
+    comment = db.session.query(Comment).get(comment_id)
+    if comment:
+        db.session.delete(comment)
+        db.session.commit()
+    return redirect(url_for("show_post", index=post_id))
 
-@app.route("/edit-post/<post_id>", methods=["GET", "POST"])
+
+@app.route("/edit-post/<post_id>", methods=["GET", "POST", "PUT"])
 @owner_only
 def edit_post(post_id):
     post = db.session.query(BlogPost).get(post_id)
@@ -192,8 +223,8 @@ def login():
         user = User.query.filter_by(email=email).first()
         # Email doesn't exist
         if not user:
-            error = "That email does not exist, please try again."
-            # return redirect(url_for('login'))
+            error = "That email does not exist, please register."
+            # return redirect(url_for('register'))
         # Password incorrect
         elif not check_password_hash(user.password, password):
             error = 'Password incorrect, please try again.'
@@ -249,4 +280,4 @@ def get_all_users():
     return "Users printed in the terminal."
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
