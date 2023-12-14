@@ -55,18 +55,18 @@
                               <div class="d-flex">
                                   <img src="{{ comment.comment_author.email | gravatar }}" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
                                   <div>
-                                      <a href="{{ url_for('show_profile', user_id=comment.comment_author.id) }}" class="date sub-text card-title">{{ comment.comment_author.name }} {{ comment.comment_author.surname }}</a>
-                                      <p class="card-text"><strong>{{ comment.text | safe }}</strong></p>
-                                      <div class="d-flex align-items-center">
-                                          <div class="likeNumber btn btn-primary mr-2">{{ comment.like_num }}</div>
-                                          <button type="button" class="btn btn-outline-primary" id="likeButton">
-                                              <i style="color: #0085a1; border: #0085a1;" class="fas fa-thumbs-up"></i>
-                                          </button>
-                                          {% if current_user.id == comment.comment_author.id or current_user.id == 1 %}
-                                              <a href="{{ url_for('delete_comment', post_id=post.id, comment_id=comment.id) }}" class="btn btn-danger ml-2">DELETE</a>
-                                          {% endif %}
-                                      </div>
-                                  </div>
+                                    <a href="{{ url_for('show_profile', user_id=comment.comment_author.id) }}" class="date sub-text card-title">{{ comment.comment_author.name }} {{ comment.comment_author.surname }}</a>
+                                    <p class="card-text"><strong>{{ comment.text | safe }}</strong></p>
+                                    <div class="d-flex align-items-center">
+                                        <div class="likeNumber btn btn-primary btn-sm mr-2">{{ comment.like_num }}</div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" id="likeButton">
+                                            <i style="color: #0085a1; font-size: 12px;" class="fas fa-thumbs-up"></i>
+                                        </button>
+                                        {% if current_user.id == comment.comment_author.id or current_user.id == 1 %}
+                                            <a href="{{ url_for('delete_comment', post_id=post.id, comment_id=comment.id) }}" class="btn btn-danger btn-sm ml-2">DEL</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
                               </div>
                           </li>
                       {% endfor %}
