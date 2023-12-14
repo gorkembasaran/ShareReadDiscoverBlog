@@ -25,23 +25,31 @@
             <h2 class="post-title">
               {{post.title}}
             </h2>
-            <h3 class="post-subtitle">
+            <hr>
+            <h5 class="post-subtitle">
               {{post.subtitle}}
-            </h3>
+            </h5>
+            <hr>
           </a>
-          <button type="button" class="btn btn-outline-primary" id="likeButton">
-                <i class="fas fa-thumbs-up"></i>
-              </button>
-              <div class="likeNumber btn btn-primary float-left"> {{post.like_num}} </div>
-          <a href="{{ url_for('get_category', name=post.category.lower()) }}">{{post.category}}</a>
-          <p class="post-meta">Posted by
-<!--            IYI VEYA KOTU MU BAKILIP KARAR VERILSIN, DUZELTILECEK KISMI VARSA DUZELTILSIN TEKRAR DIZAYN EDILSIN-->
-            <a href="#">{{post.author.name}} {{post.author.surname}}</a>
-            on {{post.date}}
-            {% if current_user.id == post.author.id or current_user.id == 1 %}
-            <a href="{{url_for('delete_post', post_id=post.id)}}">DELETE POST</a>
-            {% endif %}
-            </p>
+          <div class="d-flex align-items-center mb-2">
+            <button type="button" class="btn btn-outline-primary me-2" id="likeButton">
+                <i style="color: #0085a1; border: #0085a1;" class="fas fa-thumbs-up"></i>
+            </button>
+            <div class="likeNumber btn btn-primary me-2">{{ post.like_num }}</div>
+            <a style="color: #0085a1;" href="{{ url_for('get_category', name=post.category.lower()) }}" class="btn btn-link">{{ post.category }}</a>
+          </div>
+          
+          <p class="post-meta mb-0">
+              Posted by 
+              <a href="#" class="author-link">{{ post.author.name }} {{ post.author.surname }}</a>
+              on {{ post.date }}
+              
+              {% if current_user.id == post.author.id or current_user.id == 1 %}
+                  <a style="color: white; text-decoration: none;" href="{{ url_for('delete_post', post_id=post.id) }}" class="btn btn-danger ms-3 ml-5">
+                    <i class="fas fa-trash-alt"></i>
+                  </a>
+              {% endif %}
+          </p>
 
         </div>
         <hr>

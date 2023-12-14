@@ -119,7 +119,7 @@
           </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link" href=#>{{current_user.name}} {{current_user.surname}}</a>
+            <a class="nav-link" href="/profil">{{current_user.name}} {{current_user.surname}}</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
@@ -148,6 +148,9 @@
               content.classList.remove('hide');
               document.querySelector('.showLogin').classList.add('hide');
           });
+      });
+      document.getElementById("goRegisterButton").addEventListener("click", () => {
+        redirectToPage('/register')
       });
 
   </script>

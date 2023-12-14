@@ -210,6 +210,10 @@ def delete_post(post_id):
 def categories():
     return render_template("categories.html")
 
+@app.route("/profil")
+def profil():
+    return render_template("profil.html")
+
 
 @app.route("/contact")
 def contact():
