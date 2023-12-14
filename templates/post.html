@@ -35,41 +35,43 @@
            <div class="clearfix">
 
               <button type="button" class="btn btn-outline-primary" id="likeButton">
-                <i class="fas fa-thumbs-up"></i>
+                <i style="color: #0085a1; border: #0085a1;" class="fas fa-thumbs-up"></i>
               </button>
               <div class="likeNumber btn btn-primary float-left"> {{post.like_num}} </div>
                {% if current_user.id == post.author.id or current_user.id == 1 %}
                <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
                 {% endif %}
+                <hr>
                <!--           Comments Area -->
-<!--               BURADA DA BASTAN BAKILIP DUZELTILECEK VE TEKRAR DIZAYN EDILECEK YERLERE BAKILSIN-->
+              <!-- Alt satırlar düzenlendi. Comment Inputunu küçültmemiz gerekiyor-->
                 {{ ckeditor.load() }}
                 {{ ckeditor.config(name='comment_text') }}
                 {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
-
+                <hr>
                 <div class="col-lg-8 col-md-10 mx-auto comment">
-                    {% for comment in post.comments: %}
-                    <ul class="commentList">
-                        <li>
-                            <div class="commenterImage">
-                                 <img src="{{ comment.comment_author.email | gravatar }}"/>
-                            </div>
-                            <div class="commentText">
-                                {{comment.text|safe}}
-                                <a href="#" class="date sub-text">{{comment.comment_author.name}} {{comment.comment_author.surname}}</a>
-                                <button type="button" class="btn btn-outline-primary" id="likeButton">
-                                <i class="fas fa-thumbs-up"></i>
-                                </button>
-                                <div class="likeNumber btn btn-primary float-left"> {{comment.like_num}} </div>
-                                {% if current_user.id == comment.comment_author.id or current_user.id == 1 %}
-                                <a href="{{url_for('delete_comment', post_id=post.id, comment_id=comment.id)}}">DELETE COMMENT</a>
-                                {% endif %}
-
-                            </div>
-                        </li>
-                    </ul>
-                    {% endfor %}
-                </div>
+                  <ul class="list-group">
+                      {% for comment in post.comments %}
+                          <li class="list-group-item">
+                              <div class="d-flex">
+                                  <img src="{{ comment.comment_author.email | gravatar }}" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
+                                  <div>
+                                      <a href="#" class="date sub-text card-title">{{ comment.comment_author.name }} {{ comment.comment_author.surname }}</a>
+                                      <p class="card-text"><strong>{{ comment.text | safe }}</strong></p>
+                                      <div class="d-flex align-items-center">
+                                          <div class="likeNumber btn btn-primary mr-2">{{ comment.like_num }}</div>
+                                          <button type="button" class="btn btn-outline-primary" id="likeButton">
+                                              <i style="color: #0085a1; border: #0085a1;" class="fas fa-thumbs-up"></i>
+                                          </button>
+                                          {% if current_user.id == comment.comment_author.id or current_user.id == 1 %}
+                                              <a href="{{ url_for('delete_comment', post_id=post.id, comment_id=comment.id) }}" class="btn btn-danger ml-2">DELETE</a>
+                                          {% endif %}
+                                      </div>
+                                  </div>
+                              </div>
+                          </li>
+                      {% endfor %}
+                  </ul>
+              </div>
 
         </div>
           </div>

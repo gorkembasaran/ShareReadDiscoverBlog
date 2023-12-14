@@ -136,6 +136,7 @@ def owner_only(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
 @app.route("/post/<int:post_id>/delete-comment/<int:comment_id>")
 @owner_only
 def delete_comment(post_id, comment_id):
@@ -208,6 +209,10 @@ def delete_post(post_id):
 @app.route("/categories")
 def categories():
     return render_template("categories.html")
+
+@app.route("/profil")
+def profil():
+    return render_template("profil.html")
 
 
 @app.route("/contact")
