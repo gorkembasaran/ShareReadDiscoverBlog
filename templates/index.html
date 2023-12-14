@@ -41,7 +41,7 @@
           
           <p class="post-meta mb-0">
               Posted by 
-              <a href="#" class="author-link">{{ post.author.name }} {{ post.author.surname }}</a>
+              <a href="{{ url_for('show_profile', user_id=post.author.id) }}" class="author-link">{{ post.author.name }} {{ post.author.surname }}</a>
               on {{ post.date }}
               
               {% if current_user.id == post.author.id or current_user.id == 1 %}

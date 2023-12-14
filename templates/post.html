@@ -14,7 +14,7 @@
 <!--                    KATEGORİ DİZE GETİRİLECEK , {{post.like_num}} EKLENECEK -->
                     <h3>{{post.category}} </h3>
 					<span class="meta">Posted by
-              <a href="#">{{post.author.name}} {{post.author.surname}}</a>
+              <a href="{{ url_for('show_profile', user_id=post.author.id) }}">{{post.author.name}} {{post.author.surname}}</a>
               on {{post.date}}</span>
           </div>
         </div>
@@ -55,7 +55,7 @@
                               <div class="d-flex">
                                   <img src="{{ comment.comment_author.email | gravatar }}" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
                                   <div>
-                                      <a href="#" class="date sub-text card-title">{{ comment.comment_author.name }} {{ comment.comment_author.surname }}</a>
+                                      <a href="{{ url_for('show_profile', user_id=comment.comment_author.id) }}" class="date sub-text card-title">{{ comment.comment_author.name }} {{ comment.comment_author.surname }}</a>
                                       <p class="card-text"><strong>{{ comment.text | safe }}</strong></p>
                                       <div class="d-flex align-items-center">
                                           <div class="likeNumber btn btn-primary mr-2">{{ comment.like_num }}</div>

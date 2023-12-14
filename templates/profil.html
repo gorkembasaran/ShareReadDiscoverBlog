@@ -7,7 +7,11 @@
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="site-heading">
-            <h2>Welcome {{current_user.name}}</h2>
+              {% if current_user == user: %}
+                <h2>Welcome {{current_user.name}}</h2>
+              {% else %}
+                <h2>Welcome</h2>
+              {% endif %}
             <span style="font-size: 18px;" class="subheading"></span>
           </div>
         </div>
@@ -25,16 +29,18 @@
                     </div>
                     <div class="col-md-8">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3>{{ current_user.name }} {{ current_user.surname }} </h3>
+                            <h3>{{ user.name }} {{ user.surname }} </h3>
+                                {% if current_user == user: %}
                             <a style="color: #0085a1;" text-decoration: none;" class="btn btn-link editButton">
                                 <i  class="fas fa-edit"></i> Edit
                             </a>
+                            {% endif %}
                         </div>
                         <p>
-                            <i class="fas fa-phone-alt"></i> <strong>Phone:</strong> {{ current_user.phone }}
+                            <i class="fas fa-phone-alt"></i> <strong>Phone:</strong> {{ user.phone }}
                         </p>
                         <p>
-                            <i class="fas fa-envelope"></i> <strong>Email:</strong> {{ current_user.email }}
+                            <i class="fas fa-envelope"></i> <strong>Email:</strong> {{ user.email }}
                         </p>
                     </div>
                 </div>
@@ -66,7 +72,7 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-end mt-3">
-                        <button type="button" class="btn btn-primary saveButton">Save</button>
+                        <button href="#" type="button" class="btn btn-primary saveButton" >Save</button>
                     </div>
                 </form>
             </div>

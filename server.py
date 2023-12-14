@@ -119,25 +119,27 @@ def owner_only(f):
     def decorated_function(*args, **kwargs):
         post = db.session.query(BlogPost).get(int(kwargs['post_id']))
         try:
-            if db.session.query(Comment).get(int(kwargs['comment_id'])):
-                comment = db.session.query(Comment).get(int(kwargs['comment_id']))
-                if current_user.id != 1 and current_user.id != comment.comment_author.id:
-                    return abort(403)
+            comment = db.session.query(Comment).get(int(kwargs['comment_id']))
+            print(comment.comment_author.id, current_user.id)
+            if current_user.id != 1 and current_user.id != comment.comment_author.id:
+                return abort(403)
         except:
+            if current_user.is_authenticated:
+                if current_user.id != 1 and current_user.id != post.author.id:
+                    return abort(403)
+            else:
+                return abort(403)
             return f(*args, **kwargs)
 
         #If id is not 1 then return abort with 403 error
-        if current_user.is_authenticated:
-            if current_user.id != 1 and current_user.id != post.author.id:
-                return abort(403)
-        else:
-            return abort(403)
+
+
         #Otherwise continue with the route function
         return f(*args, **kwargs)
     return decorated_function
 
 
-@app.route("/post/<int:post_id>/delete-comment/<int:comment_id>")
+@app.route("/post/<int:post_id>/delete-comment/<int:comment_id>", methods=['GET', 'DELETE', 'POST'])
 @owner_only
 def delete_comment(post_id, comment_id):
     print(comment_id)
@@ -278,6 +280,15 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('get_all_posts'))
+
+@app.route('/profile/<int:user_id>', methods=['GET', 'POST', 'DELETE'])
+def show_profile(user_id):
+    try:
+        user = db.session.query(User).get(user_id)
+        print(user.id)
+        return render_template("profil.html", user=user)
+    except:
+        return redirect(url_for("get_all_posts"))
 
 @app.route("/get_all_users")
 def get_all_users():
