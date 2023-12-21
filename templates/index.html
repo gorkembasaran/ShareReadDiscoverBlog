@@ -32,9 +32,9 @@
             <hr>
           </a>
           <div class="d-flex align-items-center mb-2">
-            <button type="button" class="btn btn-outline-primary me-2" id="likeButton">
+            <a href="{{ url_for('like_post', post_id=post.id, page='home') }}" type="button" class="btn btn-outline-primary me-2" id="likeButton">
                 <i style="color: #0085a1; border: #0085a1;" class="fas fa-thumbs-up"></i>
-            </button>
+            </a>
             <div class="likeNumber btn btn-primary me-2">{{ post.like_num }}</div>
             <a style="color: #0085a1;" href="{{ url_for('get_category', name=post.category.lower()) }}" class="btn btn-link">{{ post.category }}</a>
           </div>

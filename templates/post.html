@@ -34,10 +34,10 @@
            <hr>
            <div class="clearfix">
 
-              <button type="button" class="btn btn-outline-primary" id="likeButton">
+              <a href="{{ url_for('like_post', post_id=post.id, page='post') }}" type="button" class="btn btn-outline-primary" id="likeButton">
                 <i style="color: #0085a1; border: #0085a1;" class="fas fa-thumbs-up"></i>
-              </button>
-              <div class="likeNumber btn btn-primary float-left"> {{post.like_num}} </div>
+              </a>
+              <div class="likeNumber btn btn-primary float-left"> {{ post.like_num }} </div>
                {% if current_user.id == post.author.id or current_user.id == 1 %}
                <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
                 {% endif %}
