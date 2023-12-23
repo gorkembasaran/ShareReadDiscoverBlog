@@ -91,7 +91,10 @@ def new_post():
 @app.route("/post/<int:index>", methods=['GET', 'POST'])
 def show_post(index):
     form = CommentForm()
+
     requested_post = BlogPost.query.get(index)
+    comments = requested_post.comments
+    print(comments, type(comments))
     if form.validate_on_submit():
         if not current_user.is_authenticated:
             flash("You need to login or register to comment.")

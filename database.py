@@ -42,7 +42,7 @@ class BlogPost(db.Model):
     likes = db.Column(db.String(250))
 
     # ***************Parent Relationship*************#
-    comments = relationship("Comment", back_populates="parent_post")
+    comments = relationship("Comment", back_populates="parent_post", order_by="desc(Comment.like_num)")
 
 class Comment(db.Model):
     __tablename__ = "comments"
