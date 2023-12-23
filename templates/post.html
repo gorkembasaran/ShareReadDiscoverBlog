@@ -43,13 +43,14 @@
                 <hr>
                <!--           Comments Area -->
               <!-- Alt satırlar düzenlendi. Comment Inputunu küçültmemiz gerekiyor-->
-                {{ ckeditor.load() }}
-                {{ ckeditor.config(name='comment_text', language='en') }}
+<!--                {{ ckeditor.load() }}-->
+<!--                {{ ckeditor.config(name='comment_text', language='en') }}-->
+               BURAYI DA DİZAYN ETMEN İYİ OLUR
+               <h5>Comment Section</h5>
                 {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
                 <hr>
                 <div class="col-lg-8 col-md-10 mx-auto comment">
                   <ul class="list-group">
-                      KODDA AŞAĞIDA CLASS İSMİ BELİRLEYİP YORUMLARI TEKRAR DİZAYN EDEBİLİRSİN
                       {% for comment in post.comments %}
                           <li class="list-group-item">
                               <div class="d-flex">

@@ -27,6 +27,8 @@
       <div class="col-lg-8 col-md-10 mx-auto">
         
           <!-- This is where the form will go -->
+        {{ ckeditor.load() }}
+        {{ ckeditor.config(name='pot_body', language='en') }}
           {{ wtf.quick_form(form, novalidate=True) }}
       </div>
     </div>
