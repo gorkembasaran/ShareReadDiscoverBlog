@@ -38,7 +38,7 @@
             <a href="{{ url_for('show_profile', user_id=post.author.id) }}">{{post.author.name}} {{post.author.surname}}</a>
             on {{post.date}}
             {% if current_user.id == post.author.id or current_user.id == 1 %}
-            <a href="{{url_for('delete_post', post_id=post.id)}}">DELETE POST</a>
+            <a href="{{url_for('delete_post', post_id=post.id, page='movies')}}">DELETE POST</a>
             {% endif %}
             </p>
 

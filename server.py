@@ -4,7 +4,7 @@ from flask_login import login_user, LoginManager, login_required, current_user, 
 from flask_gravatar import Gravatar
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from forms import CreatePostForm, LoginForm, RegisterForm, CommentForm
+from forms import CreatePostForm, CommentForm
 from database import app, db, User, BlogPost, Comment
 
 import datetime
@@ -33,7 +33,6 @@ def get_all_posts():
     posts = BlogPost.query.order_by(BlogPost.like_num.desc()).all()
     return render_template("index.html", all_posts=posts)
 
-
 @app.route("/category/<name>", methods=["GET", "POST"])
 def get_category(name):
     if name in CATEGORIES:
@@ -50,7 +49,6 @@ def owner_only(f):
         post = db.session.query(BlogPost).get(int(kwargs['post_id']))
         try:
             comment = db.session.query(Comment).get(int(kwargs['comment_id']))
-            print(comment.comment_author.id, current_user.id)
             if current_user.id != 1 and current_user.id != comment.comment_author.id:
                 return abort(403)
         except:
@@ -62,17 +60,14 @@ def owner_only(f):
             return f(*args, **kwargs)
 
         #If id is not 1 then return abort with 403 error
-
-
         #Otherwise continue with the route function
         return f(*args, **kwargs)
     return decorated_function
 
 
 @app.route("/new-post", methods=["POST", "GET"])
-@login_required
 def new_post():
-    if current_user:
+    if current_user.is_authenticated:
         form = CreatePostForm()
         if form.validate_on_submit():
             new_blog_post = BlogPost(
@@ -81,7 +76,7 @@ def new_post():
                 category=form.category.data,
                 author=current_user,
                 like_num=0,
-                likes="1",
+                likes="",
                 img_url=form.img_url.data,
                 body=form.body.data,
                 date=datetime.datetime.now().strftime("%d/%m/%y")
@@ -92,7 +87,6 @@ def new_post():
         return render_template("make-post.html", form=form)
     else:
         return redirect(url_for('login'))
-
 
 @app.route("/post/<int:index>", methods=['GET', 'POST'])
 def show_post(index):
@@ -107,12 +101,13 @@ def show_post(index):
             text=form.comment_text.data,
             comment_author=current_user,
             parent_post=requested_post,
-            like_num=0
+            like_num=0,
+            likes=""
         )
         db.session.add(new_comment)
         db.session.commit()
+        return redirect(url_for("show_post", index=requested_post.id))
     return render_template("post.html", post=requested_post, form=form, current_user=current_user)
-
 
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST", "PUT"])
 @owner_only
@@ -134,40 +129,50 @@ def edit_post(post_id):
         post.body = edit_form.body.data
         db.session.commit()
         return redirect(url_for('show_post', index=post_id))
-
     return render_template("make-post.html", form=edit_form, is_edit=post_id)
 
-
-@app.route("/delete/<int:post_id>", methods=["GET", "DELETE"])
+@app.route("/delete/<int:post_id>/<page>", methods=["GET", "DELETE"])
 @owner_only
-def delete_post(post_id):
+def delete_post(post_id, page):
     post = db.session.query(BlogPost).get(post_id)
     if post:
         db.session.delete(post)
         db.session.commit()
+    if page == "home":
+        return redirect(url_for("get_all_posts"))
+    elif page == "profile":
+        return redirect(url_for("show_profile", user_id=post.author_id))
     return redirect(url_for('get_all_posts'))
 
 @app.route("/like/post/<int:post_id>/<page>", methods=["GET", "POST", "PUT","DELETE"])
 @login_required
 def like_post(post_id, page):
     post = db.session.query(BlogPost).get(post_id)
-    if post.likes == None:
+    if post.likes == "":
         post.likes = f"{current_user.id}"
     else:
         liked_users = post.likes.split(",")
         if str(current_user.id) in liked_users:
-            post.likes = post.likes.replace(f",{current_user.id}", "")
+            if f",{current_user.id}" in post.likes:
+                post.likes = post.likes.replace(f",{current_user.id}", "")
+            elif f"{current_user.id}," in post.likes:
+                post.likes = post.likes.replace(f"{current_user.id},", "")
+            else:
+                post.likes = post.likes.replace(f"{current_user.id}", "")
             post.like_num -= 1
         else:
             post.likes = post.likes + f",{current_user.id}"
             post.like_num += 1
-    post.like_num = len(post.likes.split(",")) - 1
+    if post.likes.split(",")[0] == "":
+        post.like_num = 0
+    else:
+        post.like_num = len(post.likes.split(","))
     db.session.commit()
-    print(post.likes)
     if page == "home":
         return redirect(url_for("get_all_posts"))
-    else:
-        return redirect(url_for("show_post", index=post_id))
+    elif page == "profile":
+        return redirect(url_for("show_profile", user_id=post.author_id))
+    return redirect(url_for("show_post", index=post_id))
 
 
 @app.route("/post/<int:post_id>/delete-comment/<int:comment_id>", methods=['GET', 'DELETE', 'POST'])
@@ -179,15 +184,39 @@ def delete_comment(post_id, comment_id):
         db.session.commit()
     return redirect(url_for("show_post", index=post_id))
 
+@app.route("/like/comment/<int:comment_id>/<page>", methods=["GET", "POST", "PUT","DELETE"])
+@login_required
+def like_comment(comment_id, page):
+    comment = db.session.query(Comment).get(comment_id)
+    if comment.likes == "":
+        comment.likes = f"{current_user.id}"
+    else:
+        liked_users = comment.likes.split(",")
+        if str(current_user.id) in liked_users:
+            if f",{current_user.id}" in comment.likes:
+                comment.likes = comment.likes.replace(f",{current_user.id}", "")
+            elif f"{current_user.id}," in comment.likes:
+                comment.likes = comment.likes.replace(f"{current_user.id},", "")
+            else:
+                comment.likes = comment.likes.replace(f"{current_user.id}", "")
+            comment.like_num -= 1
+        else:
+            comment.likes = comment.likes + f",{current_user.id}"
+            comment.like_num += 1
+    if comment.likes.split(",")[0] == "":
+        comment.like_num = 0
+    else:
+        comment.like_num = len(comment.likes.split(","))
+    db.session.commit()
+    return redirect(url_for("show_post", index=comment.post_id))
+
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    form = LoginForm()
     error = None
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-
+    if request.method == "POST":
+        email = request.form.get("femail")
+        password = request.form.get("fpassword")
         user = User.query.filter_by(email=email).first()
         # Email doesn't exist
         if not user:
@@ -200,27 +229,26 @@ def login():
         else:
             login_user(user)
             return redirect(url_for('get_all_posts'))
-    return render_template("login.html", form=form, error=error)
-
+    return render_template("login.html", error=error)
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
-    form = RegisterForm()
+    # form = RegisterForm()
     if request.method == "POST":
-        email = request.form.get('email')
+        email = request.form.get('femail')
         if User.query.filter_by(email=email).first():
             return redirect(url_for('login'))
         else:
             hash_and_salted_password = generate_password_hash(
-                request.form.get('password'),
+                request.form.get('fpassword'),
                 method='pbkdf2:sha256',
                 salt_length=8
             )
             new_user = User(
                 email=email,
-                name=request.form.get('name'),
-                surname=request.form.get('surname'),
-                phone=request.form.get('phone'),
+                name=request.form.get('fname'),
+                surname=request.form.get('fsurname'),
+                phone=request.form.get('fphone'),
                 password=hash_and_salted_password,
             )
             db.session.add(new_user)
@@ -231,8 +259,7 @@ def register():
 
             return redirect(url_for("get_all_posts"))
 
-    return render_template("register.html", form=form,logged_in=current_user.is_authenticated)
-
+    return render_template("register.html", logged_in=current_user.is_authenticated)
 
 @app.route('/logout')
 @login_required
@@ -240,12 +267,13 @@ def logout():
     logout_user()
     return redirect(url_for('get_all_posts'))
 
+
 @app.route('/profile/<int:user_id>', methods=['GET', 'POST', 'DELETE'])
 def show_profile(user_id):
     try:
         user = db.session.query(User).get(user_id)
-        print(user.id)
-        return render_template("profil.html", user=user)
+        user_posts = BlogPost.query.filter_by(author_id=user_id).order_by(BlogPost.like_num.desc()).all()
+        return render_template("profile.html", user=user, user_posts=user_posts)
     except:
         return redirect(url_for("get_all_posts"))
 

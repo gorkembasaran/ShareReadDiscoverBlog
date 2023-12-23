@@ -8,7 +8,7 @@
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="site-heading">
               {% if current_user == user: %}
-                <h2>Welcome {{current_user.name}}</h2>
+                <h2>Welcome {{current_user.name.upper()}}</h2>
               {% else %}
                 <h2>{{user.name}} {{user.surname}}'s profile </h2>
               {% endif %}
@@ -83,50 +83,37 @@
     <hr>
     <!-- burada kişinin paylaştığı gönderiler açtığı konular ile birlikte gösterilecek en çok beğenilenden en az beğenilene doğru -->
     <div style="color: #0085a1;" class="container mt-4">
-        <h2>En Yeni Gönderi:</h2>
+        <h2>Posts</h2>
+                {% for post in user_posts %}
+
         <div class="card mt-4">
             <div class="card-body">
-                <h3 class="card-title">Title</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Subtitle</h6>
-                <hr>
-                <p style="font-size: 15px;" class="card-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Assumenda neque atque, voluptatum architecto similique id libero dignissimos est cumque, repellat minus saepe obcaecati excepturi, inventore porro minima quibusdam commodi recusandae?</p>
-                <hr>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-primary">Edit</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
+          <a href="{{ url_for('show_post', index=post.id) }}">
+                    <h3 class="card-title">{{post.title}}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{post.subtitle}}</h6>
+          </a>
+                    <hr>
+                    <p style="font-size: 15px;" class="card-text">{{post.body}}</p>
+                    <hr>
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('like_post', post_id=post.id, page='profile') }}" type="button" class="btn btn-outline-primary" id="likeButton">
+                <i style="color: #0085a1; border: #0085a1;" class="fas fa-thumbs-up"></i>
+              </a>
+              <div class="likeNumber btn btn-primary float-left"> {{ post.like_num }} </div>
+            <a style="color: #0085a1;" href="{{ url_for('get_category', name=post.category.lower()) }}" class="btn btn-link">{{ post.category }}</a>
+
+                        EDIT VE DELETE BUTONLARI POSTUN SAĞ ALTINA ALINACAK
+                        {% if current_user.id == post.author.id or current_user.id == 1 %}
+                        <a href="{{url_for('edit_post', post_id=post.id)}}" type="button" class="btn btn-primary">Edit</a>
+                        <a href="{{ url_for('delete_post', post_id=post.id, page='profile') }}" type="button" class="btn btn-danger">Delete</a>
+                        {% endif %}
                 </div>
             </div>
+
         </div>
+            {% endfor %}
+
         <hr>
-        <h2>En Çok Beğenilen Gönderi:</h2>
-        <div class="card mt-4">
-            <div class="card-body">
-                <h3 class="card-title">Title</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Subtitle</h6>
-                <hr>
-                <p style="font-size: 15px;" class="card-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Assumenda neque atque, voluptatum architecto similique id libero dignissimos est cumque, repellat minus saepe obcaecati excepturi, inventore porro minima quibusdam commodi recusandae?</p>
-                <hr>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-primary">Edit</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <h2>En Çok Yorum Yapılan Gönderi:</h2>
-        <div class="card mt-4">
-            <div class="card-body">
-                <h3 class="card-title">Title</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Subtitle</h6>
-                <hr>
-                <p style="font-size: 15px;" class="card-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Assumenda neque atque, voluptatum architecto similique id libero dignissimos est cumque, repellat minus saepe obcaecati excepturi, inventore porro minima quibusdam commodi recusandae?</p>
-                <hr>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-primary">Edit</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                </div>
-            </div>
-        </div>
     </div>
 
 

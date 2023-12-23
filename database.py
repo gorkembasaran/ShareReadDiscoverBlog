@@ -50,6 +50,7 @@ class Comment(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     comment_author = relationship("User", back_populates="comments")
     like_num = db.Column(db.Integer)
+    likes = db.Column(db.String(250))
 
     # ***************Child Relationship*************#
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))

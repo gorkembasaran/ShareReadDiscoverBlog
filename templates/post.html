@@ -11,8 +11,7 @@
 			<div class="col-lg-8 col-md-10 mx-auto">
 				<div class="post-heading">
 					<h1>{{post.title}}</h1>
-<!--                    KATEGORİ DİZE GETİRİLECEK , {{post.like_num}} EKLENECEK -->
-                    <h3>{{post.category}} </h3>
+                        <h3 onclick="{{ url_for('get_category', name=post.category.lower()) }}">{{post.category}} </h3>
 					<span class="meta">Posted by
               <a href="{{ url_for('show_profile', user_id=post.author.id) }}">{{post.author.name}} {{post.author.surname}}</a>
               on {{post.date}}</span>
@@ -45,11 +44,12 @@
                <!--           Comments Area -->
               <!-- Alt satırlar düzenlendi. Comment Inputunu küçültmemiz gerekiyor-->
                 {{ ckeditor.load() }}
-                {{ ckeditor.config(name='comment_text') }}
+                {{ ckeditor.config(name='comment_text', language='en') }}
                 {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
                 <hr>
                 <div class="col-lg-8 col-md-10 mx-auto comment">
                   <ul class="list-group">
+                      KODDA AŞAĞIDA CLASS İSMİ BELİRLEYİP YORUMLARI TEKRAR DİZAYN EDEBİLİRSİN
                       {% for comment in post.comments %}
                           <li class="list-group-item">
                               <div class="d-flex">
@@ -59,11 +59,11 @@
                                     <p class="card-text"><strong>{{ comment.text | safe }}</strong></p>
                                     <div class="d-flex align-items-center">
                                         <div class="likeNumber btn btn-primary btn-sm mr-2">{{ comment.like_num }}</div>
-                                        <button type="button" class="btn btn-outline-primary btn-sm" id="likeButton">
+                                        <a href="{{ url_for('like_comment', comment_id=comment.id, page='profile') }}" type="button" class="btn btn-outline-primary btn-sm" id="likeButton">
                                             <i style="color: #0085a1; font-size: 12px;" class="fas fa-thumbs-up"></i>
-                                        </button>
+                                        </a>
                                         {% if current_user.id == comment.comment_author.id or current_user.id == 1 %}
-                                            <a href="{{ url_for('delete_comment', post_id=post.id, comment_id=comment.id) }}" class="btn btn-danger btn-sm ml-2">DEL</a>
+                                            <a href="{{ url_for('delete_comment', post_id=post.id, comment_id=comment.id) }}" class="btn btn-danger btn-sm ml-2">DELETE</a>
                                         {% endif %}
                                     </div>
                                 </div>
