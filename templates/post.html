@@ -45,8 +45,6 @@
               <!-- Alt satırlar düzenlendi. Comment Inputunu küçültmemiz gerekiyor-->
 <!--                {{ ckeditor.load() }}-->
 <!--                {{ ckeditor.config(name='comment_text', language='en') }}-->
-               BURAYI DA DİZAYN ETMEN İYİ OLUR
-               <h5>Comment Section</h5>
                 {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
                 <hr>
                 <div class="col-lg-8 col-md-10 mx-auto comment">
@@ -57,14 +55,18 @@
                                   <img src="{{ comment.comment_author.email | gravatar }}" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
                                   <div>
                                     <a href="{{ url_for('show_profile', user_id=comment.comment_author.id) }}" class="date sub-text card-title">{{ comment.comment_author.name }} {{ comment.comment_author.surname }}</a>
+                                    <hr>
                                     <p class="card-text"><strong>{{ comment.text | safe }}</strong></p>
+                                    <hr>
                                     <div class="d-flex align-items-center">
                                         <div class="likeNumber btn btn-primary btn-sm mr-2">{{ comment.like_num }}</div>
                                         <a href="{{ url_for('like_comment', comment_id=comment.id, page='profile') }}" type="button" class="btn btn-outline-primary btn-sm" id="likeButton">
                                             <i style="color: #0085a1; font-size: 12px;" class="fas fa-thumbs-up"></i>
                                         </a>
                                         {% if current_user.id == comment.comment_author.id or current_user.id == 1 %}
-                                            <a href="{{ url_for('delete_comment', post_id=post.id, comment_id=comment.id) }}" class="btn btn-danger btn-sm ml-2">DELETE</a>
+                                            <a href="{{ url_for('delete_comment', post_id=post.id, comment_id=comment.id) }}" class="btn btn-danger btn-sm ml-2">
+                                              <i style="color: white;" class="fas fa-trash-alt"></i>   
+                                            </a>
                                         {% endif %}
                                     </div>
                                 </div>
