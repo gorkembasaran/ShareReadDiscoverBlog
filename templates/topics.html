@@ -30,12 +30,11 @@
               {{post.subtitle}}
             </h3>
           </a>
-          <button type="button" class="btn btn-outline-primary" id="likeButton">
-                <i style="color: #0085a1; border: #0085a1;" class="fas fa-thumbs-up"></i>
-              </button>
-              <div class="likeNumber btn btn-primary float-left"> {{post.like_num}} </div>
+              <div class="likeNumber btn btn-primary float-left"> {{post.like_num}} 
+                <i style="color: #ffff; border: #0085a1;" class="fas fa-thumbs-up"></i>
+              </div>
               {% if current_user.id == post.author.id or current_user.id == 1 %}
-              <a href="{{url_for('delete_post', post_id=post.id, page='topics')}}" type="button" class="btn btn-danger">
+              <a style="margin-left: 5px;" href="{{url_for('delete_post', post_id=post.id, page='topics')}}" type="button" class="btn btn-danger">
                 <i style="color: white;" class="fas fa-trash-alt"></i>   
               </a>
               {% endif %}
