@@ -38,7 +38,7 @@
                 <i style="color: white;" class="fas fa-trash-alt"></i>   
               </a>
               {% endif %}
-
+              <br><br>
           <p class="post-meta">Posted by
             <a href="{{ url_for('show_profile', user_id=post.author.id) }}">{{post.author.name}} {{post.author.surname}}</a>
             on {{post.date}}
